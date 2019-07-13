@@ -69,7 +69,7 @@
             "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|", 
             "h1", "h2", "h3", "h4", "h5", "h6", "|", 
             "list-ul", "list-ol", "hr", "|",
-            "link", "reference-link", "image", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
+            "link", "reference-link","video", "image", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
             "goto-line", "watch", "preview", "fullscreen", "clear", "search", "|",
             "help", "info"
         ],
@@ -205,7 +205,8 @@
             hr               : "fa-minus",
             link             : "fa-link",
             "reference-link" : "fa-anchor",
-            image            : "fa-picture-o",
+			image            : "fa-picture-o",
+			video            :"fa-file-video-o",
             code             : "fa-code",
             "preformatted-text" : "fa-file-code-o",
             "code-block"     : "fa-file-code-o",
@@ -301,6 +302,16 @@
                     imageURLEmpty    : "错误：图片地址不能为空。",
                     uploadFileEmpty  : "错误：上传的图片不能为空。",
                     formatNotAllowed : "错误：只允许上传图片文件，允许上传的图片文件格式有："
+				},
+				video : {
+                    title    : "添加视频",
+                    url      : "视频地址",
+                    link     : "视频链接",
+                    alt      : "视频描述",
+                    uploadButton     : "本地上传",
+                    imageURLEmpty    : "错误：视频地址不能为空。",
+                    uploadFileEmpty  : "错误：上传的视频不能为空。",
+                    formatNotAllowed : "错误：只允许上传视频文件，允许上传的视频文件格式有："
                 },
                 preformattedText : {
                     title             : "添加预格式文本或代码块", 
@@ -365,7 +376,7 @@
             
             var _this            = this;
             var classPrefix      = this.classPrefix  = editormd.classPrefix; 
-            var settings         = this.settings     = $.extend(true, {}, editormd.defaults, options);
+            var settings         = this.settings     = $.extend(true, editormd.defaults, options);
             
             id                   = (typeof id === "object") ? settings.id : id;
             
@@ -3107,7 +3118,11 @@
         image : function() {
             this.executePlugin("imageDialog", "image-dialog/image-dialog");
         },
+        video : function() {
+            this.executePlugin("videoDialog", "video-dialog/video-dialog");
+        },
         
+       
         code : function() {
             var cm        = this.cm;
             var cursor    = cm.getCursor();
@@ -3365,7 +3380,7 @@
 
     // Emoji graphics files url path
     editormd.emoji     = {
-        path  : "https://www.webpagefx.com/tools/emoji-cheat-sheet/graphics/emojis/",
+        path  : "http://www.emoji-cheat-sheet.com/graphics/emojis/",
         ext   : ".png"
     };
 
@@ -3573,7 +3588,7 @@
             
             var isChinese = /^[\u4e00-\u9fa5]+$/.test(text);
             var id        = (isChinese) ? escape(text).replace(/\%/g, "") : text.toLowerCase().replace(/[^\w]+/g, "-");
-
+            toc.id = id;
             markdownToC.push(toc);
             
             var headingHTML = "<h" + level + " id=\"h"+ level + "-" + this.options.headerPrefix + id +"\">";
