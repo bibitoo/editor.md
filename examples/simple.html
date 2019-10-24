@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
     <head>
+ <meta name="viewport"content="width=device-width,initial-scale=1.0,  maximum-scale=1.0,minimum-scale=1.0">
         <meta charset="utf-8" />
         <title>Simple example - Editor.md examples</title>
         <link rel="stylesheet" href="css/style.css" />
@@ -12,7 +13,7 @@
             <header>
                 <h1>Simple example</h1>
             </header>
-            <div id="test-editormd">
+            <div id="test-editormd" class="scroll-toolbar">
                 <textarea style="display:none;">[TOC]
 
 #### Disabled options
@@ -56,9 +57,19 @@
             $(function() {
                 testEditor = editormd("test-editormd", {
                     width   : "90%",
+htmlDecode : "style,script", 
                     height  : 640,
+		toolbarIcons:"simple",
+watch:true,
+videoUpload : true,
+            videoFormats : ["mp4", "mp4"],
+            videoUploadURL : "/file",
                     syncScrolling : "single",
-                    path    : "../lib/"
+                    path    : "../lib/",
+                        onload : function() {
+                            console.log('onload', this);
+                            //this.unwatch();
+                        }
                 });
                 
                 /*

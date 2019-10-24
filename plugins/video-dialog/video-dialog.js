@@ -39,7 +39,7 @@
             if (editor.find("." + dialogName).length < 1)
             {
                 var guid   = (new Date).getTime();
-                var action = settings.videoUploadURL + (settings.videoUploadURL.indexOf("?") >= 0 ? "&" : "?") + "guid=" + guid;
+                var action = settings.videoUploadURL?(settings.videoUploadURL + (settings.videoUploadURL.indexOf("?") >= 0 ? "&" : "?") + "guid=" + guid):"";
 
                 if (settings.crossDomainUpload)
                 {
@@ -56,12 +56,6 @@
                                                                             "</div>" : "";
                                         })() +
                                         "<br/>" +
-                                        "<label>" + videoLang.alt + "</label>" +
-                                        "<input type=\"text\" value=\"" + selection + "\" data-alt />" +
-                                        "<br/>" +
-                                        "<label>" + videoLang.link + "</label>" +
-                                        "<input type=\"text\" value=\"http://\" data-link />" +
-                                        "<br/>" +
                                     ( (settings.videoUpload) ? "</form>" : "</div>");
 
                 //var videoFooterHTML = "<button class=\"" + classPrefix + "btn " + classPrefix + "video-manager-btn\" style=\"float:left;\">" + videoLang.managerButton + "</button>";
@@ -69,7 +63,7 @@
                 dialog = this.createDialog({
                     title      : videoLang.title,
                     width      : (settings.videoUpload) ? 465 : 380,
-                    height     : 254,
+                    height     : 'auto',
                     name       : dialogName,
                     content    : dialogContent,
                     mask       : settings.dialogShowMask,
@@ -82,31 +76,17 @@
                     buttons : {
                         enter : [lang.buttons.enter, function() {
                             var url  = this.find("[data-url]").val();
-                            var alt  = this.find("[data-alt]").val();
-                            var link = this.find("[data-link]").val();
 
                             if (url === "")
                             {
-                                alert(videoLang.videoURLEmpty);
+                               // alert(videoLang.videoURLEmpty);
                                 return false;
                             }
-
-							var altAttr = (alt !== "") ? " \"" + alt + "\"" : "";
-
-                            if (link === "" || link === "http://")
-                            {
-								// cm.replaceSelection("![" + alt + "](" + url + altAttr + ")");
-								 cm.replaceSelection('<video class="video-js" controls="" data-setup="{&quot;errorDisplay&quot;:false}"><source src="'+url+'" type="video/mp4" /></video>');
-                            }
-                            else
-                            {
-								//cm.replaceSelection("[![" + alt + "](" + url + altAttr + ")](" + link + altAttr + ")");
-								cm.replaceSelection('<video class="video-js" controls="" data-setup="{&quot;errorDisplay&quot;:false}"><source src="'+url+'" type="video/mp4" /></video>');
-                            }
-
-                            if (alt === "") {
-                                cm.setCursor(cursor.line, cursor.ch + 2);
-                            }
+			    if(url.toLowerCase().trim().startsWith("<iframe")) {
+				cm.replaceSelection(url);
+			    }else{
+				cm.replaceSelection('<video class="video-js" controls="" data-setup="{&quot;errorDisplay&quot;:false}"><source src="'+url+'" type="video/mp4" /></video>');
+			    }
 
                             this.hide().lockScreen(false).hideMask();
 

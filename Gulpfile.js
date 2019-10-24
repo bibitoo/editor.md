@@ -5,7 +5,7 @@ var gulp         = require("gulp");
 var gutil        = require("gulp-util");
 var sass         = require("gulp-ruby-sass");
 var jshint       = require("gulp-jshint");
-var uglify       = require("gulp-uglifyjs");
+//var uglify       = require("gulp-uglifyjs");
 var rename       = require("gulp-rename");
 var concat       = require("gulp-concat");
 var notify       = require("gulp-notify");
@@ -82,7 +82,7 @@ gulp.task("js", function() {
             }}))
             .pipe(gulp.dest("./"))
             .pipe(rename({ suffix: ".min" }))
-            .pipe(uglify())  // {outSourceMap: true, sourceRoot: './'}
+ //           .pipe(uglify())  // {outSourceMap: true, sourceRoot: './'}
             .pipe(gulp.dest("./"))	
             .pipe(header(headerMiniComment, {pkg : pkg, fileName : function(file) {
                 var name = file.path.split(file.base + ( (os.platform() === "win32") ? "\\" : "/") );
@@ -184,7 +184,7 @@ gulp.task("amd", function() {
         .pipe(replace("/* Require.js assignment replace */", replaceText2))
         .pipe(gulp.dest('./'))
         .pipe(rename({ suffix: ".min" }))
-        .pipe(uglify()) //{outSourceMap: true, sourceRoot: './'}
+//        .pipe(uglify()) //{outSourceMap: true, sourceRoot: './'}
         .pipe(gulp.dest("./"))
         .pipe(header(headerMiniComment, {pkg : pkg, fileName : function(file) {
             var name = file.path.split(file.base + ( (os.platform() === "win32") ? "\\" : "/") );
@@ -274,7 +274,7 @@ gulp.task("cm-mode", function() {
     return gulp.src(modes)
                 .pipe(concat("modes.min.js"))
                 .pipe(gulp.dest(codeMirror.path.dist))
-                .pipe(uglify()) // {outSourceMap: true, sourceRoot: codeMirror.path.dist}
+ //               .pipe(uglify()) // {outSourceMap: true, sourceRoot: codeMirror.path.dist}
                 .pipe(gulp.dest(codeMirror.path.dist))	
                 .pipe(header(headerMiniComment, {pkg : pkg, fileName : function(file) {
                     var name = file.path.split(file.base + "\\"); 
@@ -296,7 +296,7 @@ gulp.task("cm-addon", function() {
     return gulp.src(addons)
                 .pipe(concat("addons.min.js"))
                 .pipe(gulp.dest(codeMirror.path.dist))
-                .pipe(uglify()) //{outSourceMap: true, sourceRoot: codeMirror.path.dist}
+ //               .pipe(uglify()) //{outSourceMap: true, sourceRoot: codeMirror.path.dist}
                 .pipe(gulp.dest(codeMirror.path.dist))	
                 .pipe(header(headerMiniComment, {pkg : pkg, fileName : function(file) {
                     var name = file.path.split(file.base + "\\");

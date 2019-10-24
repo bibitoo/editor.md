@@ -127,13 +127,14 @@
             $(function() {
                 
                 $.get('test.md', function(md){
+
                     testEditor = editormd("test-editormd", {
                         width: "90%",
                         height: 740,
                         path : '../lib/',
-                        theme : "dark",
-                        previewTheme : "dark",
-                        editorTheme : "pastel-on-dark",
+                        theme : "default",
+                        previewTheme : "default",
+                        editorTheme : "default",
                         markdown : md,
                         codeFold : true,
                         //syncScrolling : false,
@@ -157,6 +158,9 @@
                         imageUpload : true,
                         imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
                         imageUploadURL : "./php/upload.php",
+		videoUpload : true,
+            videoFormats : ["mp4", "mp4"],
+            videoUploadURL : "/file",
                         onload : function() {
                             console.log('onload', this);
                             //this.fullscreen();
@@ -169,6 +173,10 @@
                             //this.resize("100%", 640);
                         }
                     });
+editormd.emoji = {
+        path  : "http://localhost/mdeditor/emoji/images/basic/",
+        ext   : ".png"
+    };
                 });
                 
                 $("#goto-line-btn").bind("click", function(){

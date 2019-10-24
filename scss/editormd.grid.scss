@@ -2,22 +2,21 @@
 
 .editormd-grid-table {
     width: 99%;
-    display: table;
     border: 1px solid #ddd;
     border-collapse: collapse;
 }
 
 .editormd-grid-table-row {
     width: 100%;
-    display: table-row;
+    display: inline;
 
     a {
         font-size: 1.4em;
-        width: 5%;
+        width: 38px;
         height: 36px;
         color: #999;
         text-align: center;
-        display: table-cell;
+        display: inline-block;
         vertical-align: middle;
         border: 1px solid #ddd;
         text-decoration: none;

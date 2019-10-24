@@ -1,13 +1,13 @@
 /*
  * Editor.md
  *
- * @file        editormd.css 
- * @version     v1.5.0 
+ * @file        /editormd.css 
+ * @version     v1.5.1 
  * @description Open source online markdown editor.
  * @license     MIT License
  * @author      Pandao
  * {@link       https://github.com/pandao/editor.md}
- * @updateTime  2015-06-09
+ * @updateTime  2019-10-24
  */
 
 @charset "UTF-8";
@@ -443,22 +443,21 @@
 
 .editormd-grid-table {
   width: 99%;
-  display: table;
   border: 1px solid #ddd;
   border-collapse: collapse;
 }
 
 .editormd-grid-table-row {
   width: 100%;
-  display: table-row;
+  display: inline;
 }
 .editormd-grid-table-row a {
   font-size: 1.4em;
-  width: 5%;
+  width: 38px;
   height: 36px;
   color: #999;
   text-align: center;
-  display: table-cell;
+  display: inline-block;
   vertical-align: middle;
   border: 1px solid #ddd;
   text-decoration: none;
@@ -675,6 +674,7 @@
   line-height: 1.6;
   display: none;
   background: #fff;
+  z-index: 10;
 }
 
 .editormd .CodeMirror {

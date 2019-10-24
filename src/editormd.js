@@ -47,7 +47,7 @@
     };
     
     editormd.title        = editormd.$name = "Editor.md";
-    editormd.version      = "1.5.0";
+    editormd.version      = "1.5.1";
     editormd.homePage     = "https://pandao.github.io/editor.md/";
     editormd.classPrefix  = "editormd-";
     
@@ -57,22 +57,23 @@
             "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|", 
             "h1", "h2", "h3", "h4", "h5", "h6", "|", 
             "list-ul", "list-ol", "hr", "|",
-            "link", "reference-link", "image", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
+            "link", "reference-link","video",  "image", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
             "goto-line", "watch", "preview", "fullscreen", "clear", "search", "|",
-            "help", "info"
+            "help"
         ],
         simple : [
             "undo", "redo", "|", 
             "bold", "del", "italic", "quote", "uppercase", "lowercase", "|", 
-            "h1", "h2", "h3", "h4", "h5", "h6", "|", 
+	    "video",  "image" , "|", 
+            "h1", "h2", "h3",  "|", 
             "list-ul", "list-ol", "hr", "|",
-            "watch", "preview", "fullscreen", "|",
-            "help", "info"
+             "preview", "fullscreen", "|",
+            "help"
         ],
         mini : [
             "undo", "redo", "|",
-            "watch", "preview", "|",
-            "help", "info"
+            "preview", "|",
+            "help",
         ]
     };
     
@@ -153,6 +154,7 @@
         emoji                : false,          // :emoji: , Support Github emoji, Twitter Emoji (Twemoji);
                                                // Support FontAwesome icon emoji :fa-xxx: > Using fontAwesome icon web fonts;
                                                // Support Editor.md logo icon emoji :editormd-logo: :editormd-logo-1x: > 1~8x;
+
         tex                  : false,          // TeX(LaTeX), based on KaTeX
         flowChart            : false,          // flowChart.js only support IE9+
         sequenceDiagram      : false,          // sequenceDiagram.js only support IE9+
@@ -194,6 +196,7 @@
             link             : "fa-link",
             "reference-link" : "fa-anchor",
             image            : "fa-picture-o",
+	    video            :"fa-file-video-o",
             code             : "fa-code",
             "preformatted-text" : "fa-file-code-o",
             "code-block"     : "fa-file-code-o",
@@ -290,7 +293,17 @@
                     uploadFileEmpty  : "错误：上传的图片不能为空。",
                     formatNotAllowed : "错误：只允许上传图片文件，允许上传的图片文件格式有："
                 },
-                preformattedText : {
+ 		video : {
+                    title    : "添加视频",
+                    url      : "视频地址",
+                    link     : "视频链接",
+                    alt      : "视频描述",
+                    uploadButton     : "本地上传",
+                    imageURLEmpty    : "错误：视频地址不能为空。",
+                    uploadFileEmpty  : "错误：上传的视频不能为空。",
+                    formatNotAllowed : "错误：只允许上传视频文件，允许上传的视频文件格式有："
+                },
+               preformattedText : {
                     title             : "添加预格式文本或代码块", 
                     emptyAlert        : "错误：请填写预格式文本或代码的内容。"
                 },
@@ -354,6 +367,7 @@
             var _this            = this;
             var classPrefix      = this.classPrefix  = editormd.classPrefix; 
             var settings         = this.settings     = $.extend(true, editormd.defaults, options);
+
             
             id                   = (typeof id === "object") ? settings.id : id;
             
@@ -1064,7 +1078,7 @@
                     toolbar.css({
                         position : "fixed",
                         width    : editor.width() + "px",
-                        left     : ($window.width() - editor.width()) / 2 + "px"
+                        left     : editor.offset().left
                     });
                 }
                 else
@@ -3094,6 +3108,9 @@
         image : function() {
             this.executePlugin("imageDialog", "image-dialog/image-dialog");
         },
+	video : function() {
+            this.executePlugin("videoDialog", "video-dialog/video-dialog");
+        },
         
         code : function() {
             var cm        = this.cm;
@@ -4306,7 +4323,8 @@
         dialog.show().css({
             zIndex : editormd.dialogZindex,
             border : (editormd.isIE8) ? "1px solid #ddd" : "",
-            width  : (typeof options.width  === "number") ? options.width + "px"  : options.width,
+	   width:'100%',
+            maxWidth  : (typeof options.width  === "number") ? options.width + "px"  : options.width,
             height : (typeof options.height === "number") ? options.height + "px" : options.height
         });
 

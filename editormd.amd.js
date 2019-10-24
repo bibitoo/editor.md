@@ -2,12 +2,12 @@
  * Editor.md
  *
  * @file        editormd.amd.js 
- * @version     v1.5.0 
+ * @version     v1.5.1 
  * @description Open source online markdown editor.
  * @license     MIT License
  * @author      Pandao
  * {@link       https://github.com/pandao/editor.md}
- * @updateTime  2015-06-09
+ * @updateTime  2019-10-24
  */
 
 ;(function(factory) {
@@ -22,14 +22,14 @@
 	{
         if (define.amd) // for Require.js
         {
-            var cmModePath  = "./lib/codemirror/mode/";
-            var cmAddonPath = "./lib/codemirror/addon/";
+            var cmModePath  = "codemirror/mode/";
+            var cmAddonPath = "codemirror/addon/";
 
             var codeMirrorModules = [
                 "jquery", "marked", "prettify",
                 "katex", "raphael", "underscore", "flowchart",  "jqueryflowchart",  "sequenceDiagram",
 
-                "./lib/codemirror/lib/codemirror",
+                "codemirror/lib/codemirror",
                 cmModePath + "css/css",
                 cmModePath + "sass/sass",
                 cmModePath + "shell/shell",
@@ -129,7 +129,7 @@
     };
     
     editormd.title        = editormd.$name = "Editor.md";
-    editormd.version      = "1.5.0";
+    editormd.version      = "1.5.1";
     editormd.homePage     = "https://pandao.github.io/editor.md/";
     editormd.classPrefix  = "editormd-";
     
@@ -139,22 +139,23 @@
             "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|", 
             "h1", "h2", "h3", "h4", "h5", "h6", "|", 
             "list-ul", "list-ol", "hr", "|",
-            "link", "reference-link", "image", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
+            "link", "reference-link","video",  "image", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
             "goto-line", "watch", "preview", "fullscreen", "clear", "search", "|",
-            "help", "info"
+            "help"
         ],
         simple : [
             "undo", "redo", "|", 
             "bold", "del", "italic", "quote", "uppercase", "lowercase", "|", 
-            "h1", "h2", "h3", "h4", "h5", "h6", "|", 
+	    "video",  "image" , "|", 
+            "h1", "h2", "h3",  "|", 
             "list-ul", "list-ol", "hr", "|",
-            "watch", "preview", "fullscreen", "|",
-            "help", "info"
+             "preview", "fullscreen", "|",
+            "help"
         ],
         mini : [
             "undo", "redo", "|",
-            "watch", "preview", "|",
-            "help", "info"
+            "preview", "|",
+            "help",
         ]
     };
     
@@ -235,6 +236,7 @@
         emoji                : false,          // :emoji: , Support Github emoji, Twitter Emoji (Twemoji);
                                                // Support FontAwesome icon emoji :fa-xxx: > Using fontAwesome icon web fonts;
                                                // Support Editor.md logo icon emoji :editormd-logo: :editormd-logo-1x: > 1~8x;
+
         tex                  : false,          // TeX(LaTeX), based on KaTeX
         flowChart            : false,          // flowChart.js only support IE9+
         sequenceDiagram      : false,          // sequenceDiagram.js only support IE9+
@@ -276,6 +278,7 @@
             link             : "fa-link",
             "reference-link" : "fa-anchor",
             image            : "fa-picture-o",
+	    video            :"fa-file-video-o",
             code             : "fa-code",
             "preformatted-text" : "fa-file-code-o",
             "code-block"     : "fa-file-code-o",
@@ -372,7 +375,17 @@
                     uploadFileEmpty  : "错误：上传的图片不能为空。",
                     formatNotAllowed : "错误：只允许上传图片文件，允许上传的图片文件格式有："
                 },
-                preformattedText : {
+ 		video : {
+                    title    : "添加视频",
+                    url      : "视频地址",
+                    link     : "视频链接",
+                    alt      : "视频描述",
+                    uploadButton     : "本地上传",
+                    imageURLEmpty    : "错误：视频地址不能为空。",
+                    uploadFileEmpty  : "错误：上传的视频不能为空。",
+                    formatNotAllowed : "错误：只允许上传视频文件，允许上传的视频文件格式有："
+                },
+               preformattedText : {
                     title             : "添加预格式文本或代码块", 
                     emptyAlert        : "错误：请填写预格式文本或代码的内容。"
                 },
@@ -436,6 +449,7 @@
             var _this            = this;
             var classPrefix      = this.classPrefix  = editormd.classPrefix; 
             var settings         = this.settings     = $.extend(true, editormd.defaults, options);
+
             
             id                   = (typeof id === "object") ? settings.id : id;
             
@@ -1146,7 +1160,7 @@
                     toolbar.css({
                         position : "fixed",
                         width    : editor.width() + "px",
-                        left     : ($window.width() - editor.width()) / 2 + "px"
+                        left     : editor.offset().left
                     });
                 }
                 else
@@ -3176,6 +3190,9 @@
         image : function() {
             this.executePlugin("imageDialog", "image-dialog/image-dialog");
         },
+	video : function() {
+            this.executePlugin("videoDialog", "video-dialog/video-dialog");
+        },
         
         code : function() {
             var cm        = this.cm;
@@ -3252,17 +3269,20 @@
         }
     };
     
+    var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
+    var key = isMac ? "Cmd" : "Ctrl";
+    
     editormd.keyMaps = {
-        "Ctrl-1"       : "h1",
-        "Ctrl-2"       : "h2",
-        "Ctrl-3"       : "h3",
-        "Ctrl-4"       : "h4",
-        "Ctrl-5"       : "h5",
-        "Ctrl-6"       : "h6",
-        "Ctrl-B"       : "bold",  // if this is string ==  editormd.toolbarHandlers.xxxx
-        "Ctrl-D"       : "datetime",
+        [key + "-1"]       : "h1",
+        [key + "-2"]       : "h2",
+        [key + "-3"]       : "h3",
+        [key + "-4"]       : "h4",
+        [key + "-5"]       : "h5",
+        [key + "-6"]       : "h6",
+        [key + "-B"]       : "bold",  // if this is string ==  editormd.toolbarHandlers.xxxx
+        [key + "-D"]       : "datetime",
         
-        "Ctrl-E"       : function() { // emoji
+        [key + "Ctrl-E"]       : function() { // emoji
             var cm        = this.cm;
             var cursor    = cm.getCursor();
             var selection = cm.getSelection();
@@ -3279,10 +3299,10 @@
                 cm.setCursor(cursor.line, cursor.ch + 1);
             }
         },
-        "Ctrl-Alt-G"   : "goto-line",
-        "Ctrl-H"       : "hr",
-        "Ctrl-I"       : "italic",
-        "Ctrl-K"       : "code",
+        [key + "-Alt-G"]   : "goto-line",
+        [key + "-H"]       : "hr",
+        [key + "-I"]       : "italic",
+        [key + "-K"]       : "code",
         
         "Ctrl-L"        : function() {
             var cm        = this.cm;
@@ -3297,7 +3317,7 @@
                 cm.setCursor(cursor.line, cursor.ch + 1);
             }
         },
-        "Ctrl-U"         : "list-ul",
+        [key + "-U"]         : "list-ul",
         
         "Shift-Ctrl-A"   : function() {
             var cm        = this.cm;
@@ -3317,10 +3337,10 @@
             }
         },
         
-        "Shift-Ctrl-C"     : "code",
-        "Shift-Ctrl-Q"     : "quote",
-        "Shift-Ctrl-S"     : "del",
-        "Shift-Ctrl-K"     : "tex",  // KaTeX
+        ["Shift" + key + "-C"]     : "code",
+        ["Shift" + key + "Q"]     : "quote",
+        ["Shift" + key + "S"]     : "del",
+        ["Shift" + key + "K"]     : "tex",  // KaTeX
         
         "Shift-Alt-C"      : function() {
             var cm        = this.cm;
@@ -3334,16 +3354,16 @@
             } 
         },
         
-        "Shift-Ctrl-Alt-C" : "code-block",
-        "Shift-Ctrl-H"     : "html-entities",
-        "Shift-Alt-H"      : "help",
-        "Shift-Ctrl-E"     : "emoji",
-        "Shift-Ctrl-U"     : "uppercase",
-        "Shift-Alt-U"      : "ucwords",
-        "Shift-Ctrl-Alt-U" : "ucfirst",
-        "Shift-Alt-L"      : "lowercase",
+        ["Shift-" + key + "-Alt-C"]      : "code-block",
+        ["Shift-" + key + "-H"]          : "html-entities",
+        "Shift-Alt-H"                    : "help",
+        ["Shift-" + key + "-E"]          : "emoji",
+        ["Shift-" + key + "-U"]          : "uppercase",
+        "Shift-Alt-U"                    : "ucwords",
+        ["Shift-" + key + "-Alt-U"]      : "ucfirst",
+        "Shift-Alt-L"                    : "lowercase",
         
-        "Shift-Ctrl-I"     : function() {
+        ["Shift-" + key + "-I"]          : function() {
             var cm        = this.cm;
             var cursor    = cm.getCursor();
             var selection = cm.getSelection();
@@ -3357,15 +3377,15 @@
             }
         },
         
-        "Shift-Ctrl-Alt-I" : "image",
-        "Shift-Ctrl-L"     : "link",
-        "Shift-Ctrl-O"     : "list-ol",
-        "Shift-Ctrl-P"     : "preformatted-text",
-        "Shift-Ctrl-T"     : "table",
-        "Shift-Alt-P"      : "pagebreak",
-        "F9"               : "watch",
-        "F10"              : "preview",
-        "F11"              : "fullscreen",
+        ["Shift-" + key + "-Alt-I"]     : "image",
+        ["Shift-" + key + "-L"]         : "link",
+        ["Shift-" + key + "-O"]         : "list-ol",
+        ["Shift-" + key + "-P"]         : "preformatted-text",
+        ["Shift-" + key + "-T"]         : "table",
+        "Shift-Alt-P"                   : "pagebreak",
+        "F9"                            : "watch",
+        "F10"                           : "preview",
+        "F11"                           : "fullscreen",
     };
     
     /**
@@ -3425,7 +3445,7 @@
         email         : /(\w+)@(\w+)\.(\w+)\.?(\w+)?/g,
         emailLink     : /(mailto:)?([\w\.\_]+)@(\w+)\.(\w+)\.?(\w+)?/g,
         emoji         : /:([\w\+-]+):/g,
-        emojiDatetime : /(\d{2}:\d{2}:\d{2})/g,
+        emojiDatetime : /(\d{1,2}:\d{1,2}:\d{1,2})/g,
         twemoji       : /:(tw-([\w]+)-?(\w+)?):/g,
         fontAwesome   : /:(fa-([\w]+)(-(\w+)){0,}):/g,
         editormdLogo  : /:(editormd-logo-?(\w+)?):/g,
@@ -4385,7 +4405,8 @@
         dialog.show().css({
             zIndex : editormd.dialogZindex,
             border : (editormd.isIE8) ? "1px solid #ddd" : "",
-            width  : (typeof options.width  === "number") ? options.width + "px"  : options.width,
+	   width:'100%',
+            maxWidth  : (typeof options.width  === "number") ? options.width + "px"  : options.width,
             height : (typeof options.height === "number") ? options.height + "px" : options.height
         });
 
