@@ -46,17 +46,16 @@
                     action += "&callback=" + settings.uploadCallbackURL + "&dialog_id=editormd-video-dialog-" + guid;
                 }
 
-                var dialogContent = ( (settings.videoUpload) ? "<form action=\"" + action +"\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
-                                        ( (settings.videoUpload) ? "<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\" guid=\"" + guid + "\"></iframe>" : "" ) +
+                var dialogContent = ( (settings.videoUpload) ? "<div action=\"" + action +"\" id=\""+iframeName+"\"  method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
                                         "<label>" + videoLang.url + "</label>" +
                                         "<input type=\"text\" data-url /><div class=\"error\"></div>" + (function(){
                                             return (settings.videoUpload) ? "<div class=\"" + classPrefix + "file-input\">" +
                                                                                 "<input type=\"file\" name=\"" + classPrefix + "video-file\" accept=\"video/*\" />" +
-                                                                                "<input type=\"submit\" value=\"" + videoLang.uploadButton + "\" />" +
+                                                                                "<input type=\"button\" value=\"" + videoLang.uploadButton + "\" />" +
                                                                             "</div>" : "";
                                         })() +
                                         "<br/>" +
-                                    ( (settings.videoUpload) ? "</form>" : "</div>");
+                                    ( (settings.videoUpload) ? "</div>" : "</div>");
 
                 //var videoFooterHTML = "<button class=\"" + classPrefix + "btn " + classPrefix + "video-manager-btn\" style=\"float:left;\">" + videoLang.managerButton + "</button>";
 
@@ -126,14 +125,14 @@
 
 					if (fileName === "")
 					{
-						alert(videoLang.uploadFileEmpty);
+						dialog.find("div.error").html(videoLang.uploadFileEmpty);
 
                         return false;
 					}
 
                     if (!isImage.test(fileName))
 					{
-						alert(videoLang.formatNotAllowed + settings.videoFormats.join(", "));
+						dialog.find("div.error").html(videoLang.formatNotAllowed + settings.videoFormats.join(", "));
 
                         return false;
 					}
@@ -142,8 +141,41 @@
 
                     var submitHandler = function() {
 
-                        var uploadIframe = document.getElementById(iframeName);
+                       // var uploadIframe = document.getElementById(iframeName);
+			var file = dialog.find("input[type=\"file\"]")[0];
 
+			var formData = new FormData();
+			formData.append('file', file.files[0]);
+			$.ajax({
+			    url: action,
+			    type: 'POST',
+			    cache: false,
+			    data: formData,
+			    processData: false,
+			    contentType: false
+			}).done(function(json) {
+				loading(false);
+				if(!settings.crossDomainUpload)
+		                    {
+		                      if (json.success === 1)
+		                      {
+		                          dialog.find("[data-url]").val(json.url);
+		                      }
+		                      else
+		                      {
+		                          dialog.find("div.error").html(json.message);
+		                      }
+		                    }
+			}).fail(function(res) {
+				loading(false);
+				if(res.message){
+					dialog.find("div.error").html(res.message);
+				}else{
+					dialog.find("div.error").html(videoLang.uploadError);
+				}				
+			});
+
+/**
                         uploadIframe.onload = function() {
 
                             loading(false);
@@ -167,9 +199,10 @@
 
                             return false;
                         };
+**/
                     };
 
-                    dialog.find("[type=\"submit\"]").bind("click", submitHandler).trigger("click");
+                    dialog.find("[type=\"button\"]").bind("click", submitHandler).trigger("click");
 				});
             }
 

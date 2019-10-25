@@ -46,13 +46,12 @@
                     action += "&callback=" + settings.uploadCallbackURL + "&dialog_id=editormd-image-dialog-" + guid;
                 }
 
-                var dialogContent = ( (settings.imageUpload) ? "<form action=\"" + action +"\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
-                                        ( (settings.imageUpload) ? "<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\" guid=\"" + guid + "\"></iframe>" : "" ) +
+                var dialogContent = ( (settings.imageUpload) ? "<div action=\"" + action +"\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
                                         "<label>" + imageLang.url + "</label>" +
                                         "<input type=\"text\" data-url />" + (function(){
                                             return (settings.imageUpload) ? "<div class=\"" + classPrefix + "file-input\">" +
                                                                                 "<input type=\"file\" name=\"" + classPrefix + "image-file\" accept=\"image/*\" />" +
-                                                                                "<input type=\"submit\" value=\"" + imageLang.uploadButton + "\" />" +
+                                                                                "<input type=\"button\" value=\"" + imageLang.uploadButton + "\" />" +
                                                                             "</div>" : "";
                                         })() +
                                         "<br/>" +
@@ -60,9 +59,9 @@
                                         "<input type=\"text\" value=\"" + selection + "\" data-alt />" +
                                         "<br/>" +
                                         "<label>" + imageLang.link + "</label>" +
-                                        "<input type=\"text\" value=\"http://\" data-link />" +
+                                        "<input type=\"text\" value=\"http://\" data-link /><div class=\"error\"></div>" +
                                         "<br/>" +
-                                    ( (settings.imageUpload) ? "</form>" : "</div>");
+                                    ( (settings.imageUpload) ? "</div>" : "</div>");
 
                 //var imageFooterHTML = "<button class=\"" + classPrefix + "btn " + classPrefix + "image-manager-btn\" style=\"float:left;\">" + imageLang.managerButton + "</button>";
 
@@ -139,14 +138,14 @@
 
 					if (fileName === "")
 					{
-						alert(imageLang.uploadFileEmpty);
+						dialog.find("div.error").html(imageLang.uploadFileEmpty);
 
                         return false;
 					}
 
                     if (!isImage.test(fileName))
 					{
-						alert(imageLang.formatNotAllowed + settings.imageFormats.join(", "));
+						dialog.find("div.error").html(imageLang.formatNotAllowed + settings.imageFormats.join(", "));
 
                         return false;
 					}
@@ -154,35 +153,42 @@
                     loading(true);
 
                     var submitHandler = function() {
+			var file = dialog.find("input[type=\"file\"]")[0];
 
-                        var uploadIframe = document.getElementById(iframeName);
+			var formData = new FormData();
+			formData.append('file', file.files[0]);
+			$.ajax({
+			    url: action,
+			    type: 'POST',
+			    cache: false,
+			    data: formData,
+			    processData: false,
+			    contentType: false
+			}).done(function(json) {
+				loading(false);
+				if(!settings.crossDomainUpload)
+		                    {
+		                      if (json.success === 1)
+		                      {
+		                          dialog.find("[data-url]").val(json.url);
+		                      }
+		                      else
+		                      {
+		                          dialog.find("div.error").html(json.message);
+		                      }
+		                    }
+			}).fail(function(res) {
+				loading(false);
+				if(res.message){
+					dialog.find("div.error").html(res.message);
+				}else{
+					dialog.find("div.error").html(imageLang.uploadError);
+				}				
+			});
 
-                        uploadIframe.onload = function() {
-
-                            loading(false);
-
-                            var body = (uploadIframe.contentWindow ? uploadIframe.contentWindow : uploadIframe.contentDocument).document.body;
-                            var json = (body.innerText) ? body.innerText : ( (body.textContent) ? body.textContent : null);
-
-                            json = (typeof JSON.parse !== "undefined") ? JSON.parse(json) : eval("(" + json + ")");
-
-                            if(!settings.crossDomainUpload)
-                            {
-                              if (json.success === 1)
-                              {
-                                  dialog.find("[data-url]").val(json.url);
-                              }
-                              else
-                              {
-                                  alert(json.message);
-                              }
-                            }
-
-                            return false;
-                        };
                     };
 
-                    dialog.find("[type=\"submit\"]").bind("click", submitHandler).trigger("click");
+                    dialog.find("[type=\"button\"]").bind("click", submitHandler).trigger("click");
 				});
             }
 

@@ -74,7 +74,7 @@
 #{$prefix}dialog-container,
 #{$prefix}dialog-footer {
 
-    input[type="submit"], #{$prefix}btn, button {
+    input[type="submit"],input[type="button"], #{$prefix}btn, button {
         color: $color;
         min-width: 75px;
         cursor: pointer;
