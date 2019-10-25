@@ -301,7 +301,8 @@
                     uploadButton     : "本地上传",
                     imageURLEmpty    : "错误：视频地址不能为空。",
                     uploadFileEmpty  : "错误：上传的视频不能为空。",
-                    formatNotAllowed : "错误：只允许上传视频文件，允许上传的视频文件格式有："
+                    formatNotAllowed : "错误：只允许上传视频文件，允许上传的视频文件格式有：",
+		    iframeAlert	:"警告:输入包含第三方内容,可能会对系统造成不可预知的影响.请确认嵌入内容安全."
                 },
                preformattedText : {
                     title             : "添加预格式文本或代码块", 
@@ -1966,11 +1967,13 @@
          */
         
         save : function() {
-            
-            if (timer === null)
+            if(this.settings.watch)
             {
-                return this;
-            }
+		    if (timer === null)
+		    {
+		        return this;
+		    }
+	   }
             
             var _this            = this;
             var state            = this.state;

@@ -49,7 +49,7 @@
                 var dialogContent = ( (settings.videoUpload) ? "<form action=\"" + action +"\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
                                         ( (settings.videoUpload) ? "<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\" guid=\"" + guid + "\"></iframe>" : "" ) +
                                         "<label>" + videoLang.url + "</label>" +
-                                        "<input type=\"text\" data-url />" + (function(){
+                                        "<input type=\"text\" data-url /><div class=\"error\"></div>" + (function(){
                                             return (settings.videoUpload) ? "<div class=\"" + classPrefix + "file-input\">" +
                                                                                 "<input type=\"file\" name=\"" + classPrefix + "video-file\" accept=\"video/*\" />" +
                                                                                 "<input type=\"submit\" value=\"" + videoLang.uploadButton + "\" />" +
@@ -83,7 +83,9 @@
                                 return false;
                             }
 			    if(url.toLowerCase().trim().startsWith("<iframe")) {
-				cm.replaceSelection(url);
+				var regex = /(?<=src=["']).*?(?=[\"\'])/igm.exec(url);
+				var text = '<iframe  src="'+regex+'" frameborder="0"  allowfullscreen/>';
+				cm.replaceSelection(text);
 			    }else{
 				cm.replaceSelection('<video class="video-js" controls="" data-setup="{&quot;errorDisplay&quot;:false}"><source src="'+url+'" type="video/mp4" /></video>');
 			    }
@@ -106,6 +108,15 @@
 				if (!settings.videoUpload) {
                     return ;
                 }
+		var textInput  = dialog.find("[data-url]");
+		textInput.bind("change",function(){
+			var url = textInput.val();
+			if(url.toLowerCase().trim().startsWith("<iframe")) {
+				dialog.find("div.error").html(videoLang.iframeAlert);
+			}else{
+				dialog.find("div.error").html("");
+			}
+		});
 
 				var fileInput  = dialog.find("[name=\"" + classPrefix + "video-file\"]");
 

@@ -11,6 +11,9 @@
     background: #fff;
     font-size: 14px;
 }
+#{$prefix}dialog .error{
+	color:red;
+}
 
 #{$prefix}dialog-container {
     position: relative;
