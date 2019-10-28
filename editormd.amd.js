@@ -7,7 +7,7 @@
  * @license     MIT License
  * @author      Pandao
  * {@link       https://github.com/pandao/editor.md}
- * @updateTime  2019-10-26
+ * @updateTime  2019-10-29
  */
 
 ;(function(factory) {
@@ -158,6 +158,16 @@
             "help",
         ]
     };
+
+	editormd.forceRedraw = function(selectEl){
+		$(selectEl).each(function(){
+		  var element = this;
+		  var disp = element.style.display;
+		  element.style.display = 'none';
+		  var trick = element.offsetHeight;
+		  element.style.display = disp;
+		});
+	};
     
     editormd.defaults     = {
         mode                 : "gfm",          //gfm or markdown
@@ -4097,10 +4107,12 @@
         {
             if (settings.flowChart) {
                 div.find(".flowchart").flowChart(); 
+		editormd.forceRedraw(div.find(".flowchart"));
             }
 
             if (settings.sequenceDiagram) {
                 div.find(".sequence-diagram").sequenceDiagram({theme: "simple"});
+		editormd.forceRedraw(div.find(".sequence-diagram"));
             }
         }
 
